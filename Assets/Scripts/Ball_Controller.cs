@@ -57,10 +57,77 @@ public class Ball_Controller : MonoBehaviour
         ApplyCurveToBall();
     }
 
+    #region Getters & Setters
+    public Vector3 GetStartPos()
+    {
+        return _startShootPos;
+    }
+    public void SetStartPos(Vector3 v)
+    {
+        _startShootPos = v;
+    }
+    public float GetMinForce()
+    {
+        return _minForce;
+    }
+    public void SetMinForce(float v)
+    {
+        _minForce = v;
+    }
+    public float GetMaxForce()
+    {
+        return _maxForce;
+    }
+    public void SetMaxForce(float v)
+    {
+        _maxForce = v;
+    }
+    public float GetMinCurveForce()
+    {
+        return _minCurveForce;
+    }
+    public void SetMinCurveForce(float v)
+    {
+        _minCurveForce = v;
+    }
+    public float GetMaxCurveForce()
+    {
+        return _maxCurveForce;
+    }
+    public void SetMaxCurveForce(float v)
+    {
+        _maxCurveForce = v;
+    }
+    public float GetAngleDeviation()
+    {
+        return _angleMarginToNotCurve;
+    }
+    public void SetAngleDeviation(float v)
+    {
+        _angleMarginToNotCurve = v;
+    }
+    #endregion
+
+    /// <summary>
+    /// Función que aplica la fuerza inicial al balón para lanzarlo contra el target
+    /// </summary>
+    /// <param name="indexMaxDist"></param>
+    /// <param name="_sDirection"></param>
+    /// <param name="_timeInterval"></param>
+    /// <param name="_totalDistance"></param>
+    /// <param name="_totalAngle"></param>
+    /// <param name="_trace"></param>
     public void ShootBall( int indexMaxDist, Vector2 _sDirection, float _timeInterval, float _totalDistance, float _totalAngle, List<Vector2> _trace)
     {
         if(_timeInterval>=0.1f)
         {
+            //Debug.DrawLine(transform.position, transform.position + transform.right * 3, Color.green, 10.5f);
+            //Debug.DrawLine(transform.position, transform.position + transform.up * 3, Color.green, 10.5f);
+            //Debug.DrawLine(transform.position, transform.position + transform.forward * 3, Color.green, 10.5f);
+
+            //Debug.Log("New Base: " + transform.right + ", " + transform.up + ", " + transform.forward);
+            //Debug.Log("Old Base: " + Vector3.right + ", " + Vector3.up + ", " + Vector3.forward);
+
             //Debug.Log(Screen.width);
             foreach (Vector2 v in _trace)
             {
@@ -72,16 +139,28 @@ public class Ball_Controller : MonoBehaviour
             }
 
             //Debug purposes
-            //foreach(Vector2 v in _curvePathWorldPlane)
+            //foreach (Vector2 v in _curvePathWorldPlane)
             //{
-            //    GameObject.Instantiate(_marker, new Vector3(transform.position.x + (v.x/100), 0.25f, transform.position.z + (v.y/100)), Quaternion.identity);
+            //    GameObject.Instantiate(_marker, new Vector3((v.x / 100), 0.25f, (v.y / 100)), Quaternion.identity);
             //}
 
+            _shootDirection = new Vector3(_curvePathWorldPlane[indexMaxDist].x / 100, 0.45f, _curvePathWorldPlane[indexMaxDist].y / 100) - Vector3.zero;
+            _straightShootDirection = new Vector3(_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].x / 100, 0.45f, _curvePathWorldPlane[_curvePathWorldPlane.Count - 1].y / 100) - Vector3.zero;
 
-            _shootDirection = new Vector3(transform.position.x + (_curvePathWorldPlane[indexMaxDist].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[indexMaxDist].y / 100))
-                - new Vector3(transform.position.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[0].y / 100))/*transform.position*/;
-            _straightShootDirection = new Vector3(transform.position.x + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].y / 100))
-                - new Vector3(transform.position.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[0].y / 100));
+            Debug.Log(Vector3.SignedAngle(transform.right, Vector3.right, Vector3.up));
+            Quaternion q = Quaternion.AngleAxis(-Vector3.SignedAngle(transform.right, Vector3.right, Vector3.up), Vector3.up);
+            _shootDirection = q * _shootDirection;
+            _straightShootDirection = q * _straightShootDirection;
+
+
+            //_shootDirection = new Vector3(transform.position.x + (_curvePathWorldPlane[indexMaxDist].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[indexMaxDist].y / 100))
+            //    - new Vector3(transform.position.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[0].y / 100))/*transform.position*/;
+            //_straightShootDirection = new Vector3(transform.position.x + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].y / 100))
+            //    - new Vector3(transform.position.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[0].y / 100));
+            //_shootDirection = new Vector3(transform.localPosition.x + (_curvePathWorldPlane[indexMaxDist].x / 100), 0.25f, transform.localPosition.z + (_curvePathWorldPlane[indexMaxDist].y / 100))
+            //    - new Vector3(transform.localPosition.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.localPosition.z + (_curvePathWorldPlane[0].y / 100))/*transform.position*/;
+            //_straightShootDirection = new Vector3(transform.localPosition.x + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].x / 100), 0.25f, transform.localPosition.z + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].y / 100))
+            //    - new Vector3(transform.localPosition.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.localPosition.z + (_curvePathWorldPlane[0].y / 100));
 
             Debug.DrawLine(transform.position, transform.position + _shootDirection.normalized * 10, Color.red, 7.5f);
             Debug.DrawLine(transform.position, transform.position + _straightShootDirection.normalized * 20, Color.blue, 7.5f);
@@ -114,7 +193,7 @@ public class Ball_Controller : MonoBehaviour
 
 
             _baseCurveForce = SuperLerp(_minCurveForce, _maxCurveForce, _angleMarginToNotCurve, 90, _angleDiffForCurve);
-            Debug.Log(_angleDiffForCurve + " // " + _baseCurveForce);
+            //Debug.Log(_angleDiffForCurve + " // " + _baseCurveForce);
             //if (Vector3.Angle(_straightShootDirection, _shootDirection) > _angleMarginToNotCurve)
             if (_angleDiffForCurve > _angleMarginToNotCurve)
                 _computeCurve = true;
@@ -126,6 +205,9 @@ public class Ball_Controller : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Función que aplica una fuerza constante hacia el vector inercial del tiro
+    /// </summary>
     private void ApplyCurveToBall()
     {
         if(_computeCurve)
@@ -160,6 +242,13 @@ public class Ball_Controller : MonoBehaviour
         
     }
 
+    /// <summary>
+    /// Calcula la proyección de un vector sobre otro
+    /// </summary>
+    /// <param name="linePoint"></param>
+    /// <param name="lineDir"></param>
+    /// <param name="point"></param>
+    /// <returns></returns>
     private Vector3 ComputePointInLine(Vector3 linePoint, Vector3 lineDir, Vector3 point)
     {
         //lineDir.y = 0.0f;
@@ -174,12 +263,10 @@ public class Ball_Controller : MonoBehaviour
 
         return linePoint + lineDir * d;
     }
-    private void OnCollisionEnter(Collision collision)
-    {
-        //if(collision.gameObject.tag=="Goal" || collision.gameObject.tag == "Atrezzo" || collision.gameObject.tag == "Barrier")
-            _computeCurve = false;
-    }
 
+    /// <summary>
+    /// Función que permite resetear el tiro a la posición inicial
+    /// </summary>
     public void ResetDebugPosition()
     {
         _rb.velocity = Vector3.zero;
@@ -191,6 +278,7 @@ public class Ball_Controller : MonoBehaviour
         _rb.isKinematic = true;
         _rb.isKinematic = false;
         transform.position = _startShootPos;
+        transform.LookAt(_target.transform, Vector3.up);
     }
 
     /// <summary>
@@ -231,5 +319,11 @@ public class Ball_Controller : MonoBehaviour
             _minSForce = _minForce + (int)_distanceToTarget - (int)_baseDist;
             _maxSForce = _maxForce + (int)_distanceToTarget - (int)_baseDist;
         }
+    }
+
+    private void OnCollisionEnter(Collision collision)
+    {
+        //if(collision.gameObject.tag=="Goal" || collision.gameObject.tag == "Atrezzo" || collision.gameObject.tag == "Barrier")
+        _computeCurve = false;
     }
 }

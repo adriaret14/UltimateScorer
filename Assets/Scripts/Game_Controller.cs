@@ -5,10 +5,11 @@ using UnityEngine;
 public class Game_Controller : MonoBehaviour
 {
     [Header("Debug Variables")]
-    [SerializeField] private bool _isDebug;
+    [SerializeField] public bool _isDebug;
 
-    [Header("Components")]
+    [Header("GameObjects")]
     [SerializeField] private GameObject _ball;
+    [SerializeField] private GameObject _camera;
 
     void Start()
     {
@@ -24,6 +25,7 @@ public class Game_Controller : MonoBehaviour
         if(Input.GetKeyDown(KeyCode.Q) && _isDebug)
         {
             _ball.GetComponent<Ball_Controller>().ResetDebugPosition();
+            _camera.GetComponent<Camera_Controller>().PositionCameraBehindBall();
         }
     }
 }

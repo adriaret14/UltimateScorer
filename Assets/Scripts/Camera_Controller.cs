@@ -4,13 +4,19 @@ using UnityEngine;
 
 public class Camera_Controller : MonoBehaviour
 {
-    // Start is called before the first frame update
+
+    [Header("Camera Variables")]
+    [SerializeField] private Vector3 _stationaryShootDistance;
+
+    [Header("GameObjects")]
+    [SerializeField] private GameObject _ball;
+    [SerializeField] private GameObject _target;
+
+
     void Start()
     {
         
     }
-
-    // Update is called once per frame
     void Update()
     {
         
@@ -19,7 +25,13 @@ public class Camera_Controller : MonoBehaviour
     public void PositionCameraBehindBall()
     {
         //Tener en cuenta los disparos con el balon en movimiento
-        
+
+        Vector3 aux = (_target.transform.position - _ball.transform.position).normalized;
+        Vector3 finalPos = _ball.transform.position + (aux * _stationaryShootDistance.z);
+        finalPos.y = _stationaryShootDistance.y;
+
+        transform.position = finalPos;
+        transform.LookAt(_target.transform, Vector3.up);
     }
 
     public void CameraShootAction()

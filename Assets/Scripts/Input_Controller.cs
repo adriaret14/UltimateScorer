@@ -8,6 +8,7 @@ public class Input_Controller : MonoBehaviour
 
     [Header("GameObject References")]
     [SerializeField] private GameObject _ball;
+    [SerializeField] private bool _touchEnabled;
 
     public bool _shootStarted;
     public float _startShootTime;
@@ -33,36 +34,67 @@ public class Input_Controller : MonoBehaviour
 
     private void CheckForInput()
     {
-        if(Input.GetMouseButton(1))
+        if(!_touchEnabled)
         {
-            //Slow time(slowmotion)
-        }
-        else if(Input.GetMouseButton(0))
-        {
-            //Shoot procedure
-            if(!_shootStarted)
+            if (Input.GetMouseButton(1))
             {
-                _shootStarted = true;
-                _startShootTime = Time.time;
-                _startShootScreenPos = Input.mousePosition;
+                //Slow time(slowmotion)
             }
-            else
+            else if (Input.GetMouseButton(0))
             {
-                //Save positions to get a trace
-                if(!_shootTrace.Contains(Input.mousePosition))
-                    _shootTrace.Add(Input.mousePosition);
+                //Shoot procedure
+                if (!_shootStarted)
+                {
+                    _shootStarted = true;
+                    _startShootTime = Time.time;
+                    _startShootScreenPos = Input.mousePosition;
+                }
+                else
+                {
+                    //Save positions to get a trace
+                    if (!_shootTrace.Contains(Input.mousePosition))
+                        _shootTrace.Add(Input.mousePosition);
 
+                }
+            }
+            else if (Input.GetMouseButtonUp(0) && _shootStarted)
+            {
+                //Shoot end
+                _shootStarted = false;
+                _endShootTime = Time.time;
+                _endShootScreenPos = Input.mousePosition;
+
+                GetTotalAngle();
             }
         }
-        else if(Input.GetMouseButtonUp(0) && _shootStarted)
+        else
         {
-            //Shoot end
-            _shootStarted = false;
-            _endShootTime = Time.time;
-            _endShootScreenPos = Input.mousePosition;
+            if(Input.touchCount > 0)
+            {
+                //Si quieres hacer lo de ralentizar el tiempo deberiamos poner aqui el touch 0
+                if(Input.GetTouch(0).phase == TouchPhase.Began)
+                {
+                    _shootStarted = true;
+                    _startShootTime = Time.time;
+                    _startShootScreenPos = Input.GetTouch(0).position;
+                }
+                else if(Input.GetTouch(0).phase == TouchPhase.Moved)
+                {
+                    if (!_shootTrace.Contains(Input.GetTouch(0).position))
+                        _shootTrace.Add(Input.GetTouch(0).position);
+                }
+                else if(Input.GetTouch(0).phase==TouchPhase.Ended)
+                {
+                    //Shoot end
+                    _shootStarted = false;
+                    _endShootTime = Time.time;
+                    _endShootScreenPos = Input.GetTouch(0).position;
 
-            GetTotalAngle();
+                    GetTotalAngle();
+                }
+            }
         }
+        
     }
 
     private void GetTotalAngle()
