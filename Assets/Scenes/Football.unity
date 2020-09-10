@@ -325,6 +325,7 @@ GameObject:
   - component: {fileID: 244429888}
   - component: {fileID: 244429887}
   - component: {fileID: 244429886}
+  - component: {fileID: 244429889}
   m_Layer: 0
   m_Name: Main Camera
   m_TagString: MainCamera
@@ -391,12 +392,24 @@ Transform:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 244429885}
   m_LocalRotation: {x: 0.046418924, y: -0, z: -0, w: 0.9989221}
-  m_LocalPosition: {x: 0, y: 2.14, z: -3.3}
+  m_LocalPosition: {x: 0, y: 2.14, z: -13.3}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_Children: []
   m_Father: {fileID: 0}
   m_RootOrder: 0
   m_LocalEulerAnglesHint: {x: 5.321, y: 0, z: 0}
+--- !u!114 &244429889
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 244429885}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 67c9744d6b50af44fb34b561a3b84857, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
 --- !u!1 &434874469 stripped
 GameObject:
   m_CorrespondingSourceObject: {fileID: 1292107518500982382, guid: f38bf33f175138748a5d4a0f79f30676, type: 3}
@@ -440,15 +453,14 @@ MonoBehaviour:
   _maxForce: 160
   _baseDist: 20
   _baseCurveForce: 8
-  _angleMarginToNotCurve: 25
+  _minCurveForce: 3
+  _maxCurveForce: 10
+  _angleMarginToNotCurve: 5
   _rb: {fileID: 434874470}
   _target: {fileID: 1930711612}
   _marker: {fileID: 8101071661749585420, guid: 95d52693096a793478b9024238d865d4, type: 3}
-  _computeCurve: 0
-  _contComputeCurve: 0
-  _computeCurveDirection: 0
-  _effectVector: {x: 0, y: 0, z: 0}
-  _prevEffectVector: {x: 0, y: 0, z: 0}
+  _minSForce: 0
+  _maxSForce: 0
 --- !u!1001 &633180360
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -774,7 +786,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 2668470761359323712, guid: f38bf33f175138748a5d4a0f79f30676, type: 3}
       propertyPath: m_LocalPosition.z
-      value: 0
+      value: -10
       objectReference: {fileID: 0}
     - target: {fileID: 2668470761359323712, guid: f38bf33f175138748a5d4a0f79f30676, type: 3}
       propertyPath: m_LocalRotation.x

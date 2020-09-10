@@ -12,6 +12,8 @@ public class Ball_Controller : MonoBehaviour
     [SerializeField] private float _maxForce;
     [SerializeField] private float _baseDist;
     [SerializeField] private float _baseCurveForce;
+    [SerializeField] private float _minCurveForce;
+    [SerializeField] private float _maxCurveForce;
     [SerializeField] private float _angleMarginToNotCurve;
 
     [Header("Components")]
@@ -33,11 +35,14 @@ public class Ball_Controller : MonoBehaviour
     private Vector3 _shootDirection;
     private Vector3 _straightShootDirection;
 
-    public bool _computeCurve;
-    public int _contComputeCurve;
-    public DirEffect _computeCurveDirection;
-    public Vector3 _effectVector;
-    public Vector3 _prevEffectVector;
+    private bool _computeCurve;
+    private int _contComputeCurve;
+    private DirEffect _computeCurveDirection;
+    private Vector3 _effectVector;
+    private Vector3 _prevEffectVector;
+    private float _angleDiffForCurve;
+    public float _minSForce;
+    public float _maxSForce;
 
     void Start()
     {
@@ -90,7 +95,9 @@ public class Ball_Controller : MonoBehaviour
             _shootDirection.y = 0.45f;  //Siempre disparamos en 45º en el eje Y?????
 
             //float _distFactor = SuperLerp((_minForce*_distanceToTarget)/_baseDist, (_maxForce*_distanceToTarget/_baseDist), 0, Screen.height, _totalDistance);
-            float _distFactor = SuperLerp(_minForce, _maxForce, 0, Screen.height, _totalDistance);
+
+            ModifyForcesOfShoot();
+            float _distFactor = SuperLerp(_minSForce, _maxSForce, 0, Screen.height, _totalDistance);
             //Debug.Log((_minForce * _distanceToTarget) / _baseDist);
             _rb.AddForce(_shootDirection.normalized * _distFactor / Mathf.Pow(_timeInterval, 1.05f) /*_timeInterval * 2*/);
 
@@ -99,8 +106,17 @@ public class Ball_Controller : MonoBehaviour
 
             //Debug.Log(_timeInterval);
 
-            Debug.Log(Vector3.Angle(_straightShootDirection, _shootDirection));
-            if (Vector3.Angle(_straightShootDirection, _shootDirection) > _angleMarginToNotCurve)
+            Vector3 auxV1 = _straightShootDirection;
+            auxV1.y = 0;
+            Vector3 auxV2 = _shootDirection;
+            auxV2.y = 0;
+            _angleDiffForCurve = Vector3.Angle(auxV1, auxV2);
+
+
+            _baseCurveForce = SuperLerp(_minCurveForce, _maxCurveForce, _angleMarginToNotCurve, 90, _angleDiffForCurve);
+            Debug.Log(_angleDiffForCurve + " // " + _baseCurveForce);
+            //if (Vector3.Angle(_straightShootDirection, _shootDirection) > _angleMarginToNotCurve)
+            if (_angleDiffForCurve > _angleMarginToNotCurve)
                 _computeCurve = true;
         }
         else
@@ -193,5 +209,27 @@ public class Ball_Controller : MonoBehaviour
         else if (value >= to2)
             return to;
         return (to - from) * ((value - from2) / (to2 - from2)) + from;
+    }
+
+    /// <summary>
+    /// Esta funcion escala el máximo y minimo de fuerza disponible para el balón en fucnión del target, basandonos en el base dist
+    /// </summary>
+    private void ModifyForcesOfShoot()
+    {
+        if(_distanceToTarget <= _baseDist)
+        {
+            _minSForce = _minForce;
+            _maxSForce = _maxForce;
+        }
+        else
+        {
+            float sDifference_ = _distanceToTarget % _baseDist;     //Sumador diferencia
+            float mDifference_ = _distanceToTarget / _baseDist;     //Multiplcador diferencia
+
+            //_minSForce = (_minForce * (int)mDifference_) + (int)sDifference_;
+            //_maxSForce = (_maxForce * (int)mDifference_) + (int)sDifference_;            
+            _minSForce = _minForce + (int)_distanceToTarget - (int)_baseDist;
+            _maxSForce = _maxForce + (int)_distanceToTarget - (int)_baseDist;
+        }
     }
 }
