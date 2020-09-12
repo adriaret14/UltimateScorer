@@ -15,6 +15,8 @@ public class Ball_Controller : MonoBehaviour
     [SerializeField] private float _minCurveForce;
     [SerializeField] private float _maxCurveForce;
     [SerializeField] private float _angleMarginToNotCurve;
+    [SerializeField] private float _verticalMinAngle;
+    [SerializeField] private float _verticalMaxAngle;
 
     [Header("Components")]
     [SerializeField] private Rigidbody _rb;
@@ -119,7 +121,7 @@ public class Ball_Controller : MonoBehaviour
     /// <param name="_trace"></param>
     public void ShootBall( int indexMaxDist, Vector2 _sDirection, float _timeInterval, float _totalDistance, float _totalAngle, List<Vector2> _trace)
     {
-        if(_timeInterval>=0.1f)
+        if(_timeInterval>=0.12f)
         {
             //Debug.DrawLine(transform.position, transform.position + transform.right * 3, Color.green, 10.5f);
             //Debug.DrawLine(transform.position, transform.position + transform.up * 3, Color.green, 10.5f);
@@ -128,7 +130,7 @@ public class Ball_Controller : MonoBehaviour
             //Debug.Log("New Base: " + transform.right + ", " + transform.up + ", " + transform.forward);
             //Debug.Log("Old Base: " + Vector3.right + ", " + Vector3.up + ", " + Vector3.forward);
 
-            //Debug.Log(Screen.width);
+
             foreach (Vector2 v in _trace)
             {
                 _curvePath.Add(v);
@@ -153,15 +155,6 @@ public class Ball_Controller : MonoBehaviour
             _straightShootDirection = q * _straightShootDirection;
 
 
-            //_shootDirection = new Vector3(transform.position.x + (_curvePathWorldPlane[indexMaxDist].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[indexMaxDist].y / 100))
-            //    - new Vector3(transform.position.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[0].y / 100))/*transform.position*/;
-            //_straightShootDirection = new Vector3(transform.position.x + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].y / 100))
-            //    - new Vector3(transform.position.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.position.z + (_curvePathWorldPlane[0].y / 100));
-            //_shootDirection = new Vector3(transform.localPosition.x + (_curvePathWorldPlane[indexMaxDist].x / 100), 0.25f, transform.localPosition.z + (_curvePathWorldPlane[indexMaxDist].y / 100))
-            //    - new Vector3(transform.localPosition.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.localPosition.z + (_curvePathWorldPlane[0].y / 100))/*transform.position*/;
-            //_straightShootDirection = new Vector3(transform.localPosition.x + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].x / 100), 0.25f, transform.localPosition.z + (_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].y / 100))
-            //    - new Vector3(transform.localPosition.x + (_curvePathWorldPlane[0].x / 100), 0.25f, transform.localPosition.z + (_curvePathWorldPlane[0].y / 100));
-
             Debug.DrawLine(transform.position, transform.position + _shootDirection.normalized * 10, Color.red, 7.5f);
             Debug.DrawLine(transform.position, transform.position + _straightShootDirection.normalized * 20, Color.blue, 7.5f);
 
@@ -171,14 +164,21 @@ public class Ball_Controller : MonoBehaviour
 
             //Debug.Log("Raw: " + _totalDistance + " // Escalated: " + SuperLerp(_minForce, _maxForce, 0, Screen.height, _totalDistance));
             _shootDirection.Normalize();
-            _shootDirection.y = 0.45f;  //Siempre disparamos en 45º en el eje Y?????
+            //_shootDirection.y = 0.45f;  
+            _shootDirection.y = 0; //Siempre disparamos en 45º en el eje Y????? NO! Debe ir en función de la distancia del dedo recorrida en pantalla(verticalmente solo?) SuperLerp(15.0f, 55.0f, 0, Screen.height, _totalDistance);
+            Quaternion qShoot = Quaternion.AngleAxis(SuperLerp(_verticalMinAngle, _verticalMaxAngle, 0, Screen.height, _totalDistance), Vector3.Cross(Vector3.up, _shootDirection).normalized);
+            float auxTimeInterval = _timeInterval;
+            _timeInterval = Mathf.Clamp(_timeInterval, 0.14f, 0.28f);
+            Debug.Log(_timeInterval);
+            _shootDirection = qShoot * _shootDirection;
+            //_straightShootDirection = qShoot * _straightShootDirection;
 
             //float _distFactor = SuperLerp((_minForce*_distanceToTarget)/_baseDist, (_maxForce*_distanceToTarget/_baseDist), 0, Screen.height, _totalDistance);
 
             ModifyForcesOfShoot();
             float _distFactor = SuperLerp(_minSForce, _maxSForce, 0, Screen.height, _totalDistance);
             //Debug.Log((_minForce * _distanceToTarget) / _baseDist);
-            _rb.AddForce(_shootDirection.normalized * _distFactor / Mathf.Pow(_timeInterval, 1.05f) /*_timeInterval * 2*/);
+            _rb.AddForce(_shootDirection.normalized * _distFactor / Mathf.Pow(_timeInterval, 1.2f));
 
 
             _startShootPos = transform.position;
