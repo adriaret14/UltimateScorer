@@ -121,6 +121,8 @@ public class Ball_Controller : MonoBehaviour
     /// <param name="_trace"></param>
     public void ShootBall( int indexMaxDist, Vector2 _sDirection, float _timeInterval, float _totalDistance, float _totalAngle, List<Vector2> _trace)
     {
+        //Debug.Log(Screen.height);
+        Debug.Log(Screen.currentResolution.height);
         if(_timeInterval>=0.12f)
         {
             //Debug.DrawLine(transform.position, transform.position + transform.right * 3, Color.green, 10.5f);
@@ -149,7 +151,7 @@ public class Ball_Controller : MonoBehaviour
             _shootDirection = new Vector3(_curvePathWorldPlane[indexMaxDist].x / 100, 0.45f, _curvePathWorldPlane[indexMaxDist].y / 100) - Vector3.zero;
             _straightShootDirection = new Vector3(_curvePathWorldPlane[_curvePathWorldPlane.Count - 1].x / 100, 0.45f, _curvePathWorldPlane[_curvePathWorldPlane.Count - 1].y / 100) - Vector3.zero;
 
-            Debug.Log(Vector3.SignedAngle(transform.right, Vector3.right, Vector3.up));
+            //Debug.Log(Vector3.SignedAngle(transform.right, Vector3.right, Vector3.up));
             Quaternion q = Quaternion.AngleAxis(-Vector3.SignedAngle(transform.right, Vector3.right, Vector3.up), Vector3.up);
             _shootDirection = q * _shootDirection;
             _straightShootDirection = q * _straightShootDirection;
@@ -169,14 +171,14 @@ public class Ball_Controller : MonoBehaviour
             Quaternion qShoot = Quaternion.AngleAxis(SuperLerp(_verticalMinAngle, _verticalMaxAngle, 0, Screen.height, _totalDistance), Vector3.Cross(Vector3.up, _shootDirection).normalized);
             float auxTimeInterval = _timeInterval;
             _timeInterval = Mathf.Clamp(_timeInterval, 0.14f, 0.28f);
-            Debug.Log(_timeInterval);
+            //Debug.Log(_timeInterval);
             _shootDirection = qShoot * _shootDirection;
             //_straightShootDirection = qShoot * _straightShootDirection;
 
             //float _distFactor = SuperLerp((_minForce*_distanceToTarget)/_baseDist, (_maxForce*_distanceToTarget/_baseDist), 0, Screen.height, _totalDistance);
 
             ModifyForcesOfShoot();
-            float _distFactor = SuperLerp(_minSForce, _maxSForce, 0, Screen.height, _totalDistance);
+            float _distFactor = SuperLerp(_minSForce, _maxSForce, 0, Screen.currentResolution.height, _totalDistance);
             //Debug.Log((_minForce * _distanceToTarget) / _baseDist);
             _rb.AddForce(_shootDirection.normalized * _distFactor / Mathf.Pow(_timeInterval, 1.2f));
 
